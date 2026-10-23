@@ -19,6 +19,14 @@ public class Drawing {
         shapes.add(shape);
     }
 
+    /** Inserts a non-null shape at the given position in painting order. */
+    public void add(int index, Shape shape) {
+        if(shape == null)
+            throw new IllegalArgumentException("Shape cannot be null.");
+
+        shapes.add(index, shape);
+    }
+
     /** Removes the first matching shape and reports whether it was present. */
     public boolean remove(Shape shape) {
         return shapes.remove(shape);
