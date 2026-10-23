@@ -177,8 +177,7 @@ public class DrawingCanvas extends JPanel {
             // because the command applies the movement and records its inverse.
             selectedShape.moveBy(-draggedDx, -draggedDy);
 
-            commandManager.executeCommand(
-                    new MoveShapeCommand(selectedShape, draggedDx, draggedDy)
+            commandManager.executeCommand(new MoveShapeCommand(selectedShape, draggedDx, draggedDy)
             );
         }
 
@@ -196,9 +195,53 @@ public class DrawingCanvas extends JPanel {
             return;
         }
 
-        // Shape creation is not implemented in the supplied code.
-        // This handler needs to calculate the shape bounds, create a LineShape,
-        // RectangleShape, or EllipseShape using currentColor, and execute an
-        // AddShapeCommand to complete the drawing tools.
+        // Ignore a release without a matching press.
+        if (dragStart == null) {
+            return;
+        }
+
+        Point end = event.getPoint();
+        Shape shape = null;
+
+        // Create the requested shape using the drag's start and end points.
+        switch (activeTool) {
+            case LINE:
+                shape = new LineShape(
+                        dragStart.x, dragStart.y,
+                        end.x, end.y,
+                        currentColor, 1.0f
+                );
+                break;
+
+            case RECTANGLE:
+            case ELLIPSE:
+                int x = Math.min(dragStart.x, end.x);
+                int y = Math.min(dragStart.y, end.y);
+                int width = Math.abs(end.x - dragStart.x);
+                int height = Math.abs(end.y - dragStart.y);
+
+                if (activeTool == Tool.RECTANGLE) {
+                    shape = new RectangleShape(
+                            x, y, width, height, currentColor, 1.0f
+                    );
+                } else {
+                    shape = new EllipseShape(
+                            x, y, width, height, currentColor, 1.0f
+                    );
+                }
+                break;
+
+            default:
+                break;
+        }
+
+        // Add the new shape to the drawing and undo history.
+        if (shape != null) {
+            commandManager.executeCommand(new AddShapeCommand(drawing, shape));
+        }
+
+        // Clear the drag state and refresh the canvas.
+        dragStart = null;
+        repaint();
     }
 }

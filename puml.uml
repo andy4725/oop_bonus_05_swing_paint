@@ -1,0 +1,59 @@
+# UML class diagram
+
+```mermaid
+classDiagram
+    class Command {
+        <<interface>>
+        +execute()
+        +undo()
+        +getName() String
+    }
+
+    class CommandManager {
+        -undoStack: Deque~Command~
+        -redoStack: Deque~Command~
+        +executeCommand(command)
+        +undo()
+        +redo()
+    }
+
+    class AddShapeCommand
+    class DeleteShapeCommand
+    class MoveShapeCommand
+    class ChangeColorCommand
+
+    Command <|.. AddShapeCommand
+    Command <|.. DeleteShapeCommand
+    Command <|.. MoveShapeCommand
+    Command <|.. ChangeColorCommand
+    CommandManager --> Command : stores
+
+    class Drawing {
+        -shapes: List~Shape~
+        +add(shape)
+        +remove(shape)
+        +findTopShapeAt(point)
+    }
+
+    class Shape {
+        <<abstract>>
+        -color: Color
+        -strokeWidth: float
+        +draw(graphics)
+        +contains(point) boolean
+        +moveBy(dx, dy)
+    }
+
+    class LineShape
+    class RectangleShape
+    class EllipseShape
+
+    Shape <|-- LineShape
+    Shape <|-- RectangleShape
+    Shape <|-- EllipseShape
+    Drawing o-- Shape
+
+    AddShapeCommand --> Drawing
+    DeleteShapeCommand --> Drawing
+    MoveShapeCommand --> Shape
+    ChangeColorCommand --> Shape
